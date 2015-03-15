@@ -1,14 +1,10 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 This is the First Assignment for the course **Reproducible Research** 
 
 ##First Loading and Processing the data
 
-```{r First}
+
+```r
 activity <- read.csv("activity.csv")
 activity$date <- as.Date(activity$date)
 ```
@@ -21,11 +17,28 @@ activity$date <- as.Date(activity$date)
 
 3- Calculate and report the mean and median of the total number of steps taken per day
 
-```{r Second}
+
+```r
 steps_total <- tapply(activity$steps, activity$date, sum)
 barplot(steps_total, main="Total number of steps", xlab="day", ylab="steps")
+```
+
+![](PA1_template_files/figure-html/Second-1.png) 
+
+```r
 mean(steps_total, na.rm=TRUE)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(steps_total, na.rm=TRUE)
+```
+
+```
+## [1] 10765
 ```
 
 ##Third What is the average daily activity pattern?
@@ -35,10 +48,21 @@ median(steps_total, na.rm=TRUE)
 2- Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 
-```{r Third}
+
+```r
 steps_per_interval <- tapply(activity$steps, activity$interval, mean, na.rm=TRUE)
 plot(steps_per_interval, main="Average steps per time interval", xlab="interval", ylab="average steps", type="l")
+```
+
+![](PA1_template_files/figure-html/Third-1.png) 
+
+```r
 steps_per_interval[which.max(steps_per_interval)]
+```
+
+```
+##      835 
+## 206.1698
 ```
 
 ## Fourth Imputing missing values
@@ -48,18 +72,40 @@ steps_per_interval[which.max(steps_per_interval)]
 2- Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
 
-```{r Fourth}
-sum(is.na(activity$steps))
 
+```r
+sum(is.na(activity$steps))
+```
+
+```
+## [1] 2304
+```
+
+```r
 for (i in 1:nrow(activity)){
   activity$steps[i] <- ifelse(is.na(activity$steps[i]), steps_per_interval[row.names(steps_per_interval)==activity$interval[i]], activity$steps[i])
 }
 
 steps_total <- tapply(activity$steps, activity$date, sum)
 barplot(steps_total, main="Total number of steps", xlab="day", ylab="steps")
-mean(steps_total)
-median(steps_total)
+```
 
+![](PA1_template_files/figure-html/Fourth-1.png) 
+
+```r
+mean(steps_total)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
+median(steps_total)
+```
+
+```
+## [1] 10766.19
 ```
 
 By replacing the NA value by the mean of this time interval we find that the mean remain unchanged while the median has a minor change and it became exactly like the mean
@@ -71,12 +117,14 @@ By replacing the NA value by the mean of this time interval we find that the mea
 
 2- Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
 
-``` {r Fifth}
+
+```r
 activity$weekday <- ifelse(weekdays(activity$date)=="Saturday"|weekdays(activity$date)=="Saturday", "weekend", "weekday")
 activity$weekday <- factor(activity$weekday)
 
 test <- aggregate(activity$steps, list(activity$interval, activity$weekday), mean)
 library(lattice)
 xyplot(x~Group.1|Group.2, data=test, xlab="Interval", ylab="Number of steps", layout=c(1,2), type= "l" )
-
 ```
+
+![](PA1_template_files/figure-html/Fifth-1.png) 
